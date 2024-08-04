@@ -4,7 +4,8 @@
 #include <QWidget>
 
 QT_BEGIN_NAMESPACE
-namespace Ui {
+namespace Ui
+{
     class Widget;
 }
 QT_END_NAMESPACE
@@ -16,7 +17,7 @@ class Widget : public QWidget
     Q_OBJECT
 
 public:
-    Widget(QWidget* parent = nullptr);
+    Widget(QWidget *parent = nullptr);
     ~Widget();
 
 private slots:
@@ -24,11 +25,11 @@ private slots:
     void on_btn_create_clicked();
 
 private:
-    bool copyPath(const QString& sourceDir, const QString& destinationDir);
-    void createFile(const QString& filePath, const QString& fileName, const QString& suffix, const QString& contents);
+    bool copyPath(const QString &sourceDir, const QString &destinationDir);
+    void createFile(const QString &filePath, const QString &fileName, const QString &suffix, const QString &contents);
 
 private:
-    Ui::Widget* ui;
+    Ui::Widget *ui;
     QString m_className;
 };
 #endif

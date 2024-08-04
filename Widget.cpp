@@ -36,11 +36,36 @@ void Widget::on_btn_browse_clicked()
         ui->lineEdit_path->setText(filePath);
     }
 }
-
 //========================================================================================================================
 
 void Widget::on_btn_create_clicked()
 {
+    ui->lineEdit_className->setText(ui->lineEdit_className->text().trimmed());
+
+    if (ui->lineEdit_path->text().isEmpty() ||
+        ui->lineEdit_className->text().isEmpty())
+    {
+        QMessageBox::warning(this, "Invalid Input Value", "Class name and path cannot be empty.", QMessageBox::Button::Ok, QMessageBox::Icon::Critical);
+        return;
+    }
+
+    QDir dir(ui->lineEdit_path->text());
+
+    if (!dir.exists())
+    {
+        QMessageBox::warning(this, "Invalid Input Value", "This Path not exists.", QMessageBox::Button::Ok, QMessageBox::Icon::Critical);
+        return;
+    }
+
+    for (const QFileInfo &file : dir.entryInfoList(QDir::Dirs))
+    {
+        if (file.fileName() == ui->lineEdit_className->text())
+        {
+            QMessageBox::warning(this, "Invalid Input Value", "This Class exists.", QMessageBox::Button::Ok, QMessageBox::Icon::Critical);
+            return;
+        }
+    }
+
     m_className = ui->lineEdit_className->text();
 
     bool hasForm = ui->comboBox_baseClass->currentIndex() > 0;
@@ -94,5 +119,6 @@ void Widget::createFile(const QString &filePath, const QString &fileName, const 
 
     file.close();
 }
+//========================================================================================================================
 
 //========================================================================================================================
