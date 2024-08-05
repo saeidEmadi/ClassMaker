@@ -24,6 +24,10 @@ private slots:
     void on_btn_browse_clicked();
     void on_btn_create_clicked();
 
+    void on_btn_copy_clicked();
+
+    void onTimeout();
+
 private:
     bool copyPath(const QString &sourceDir, const QString &destinationDir);
     void createFile(const QString &filePath, const QString &fileName, const QString &suffix, const QString &contents);

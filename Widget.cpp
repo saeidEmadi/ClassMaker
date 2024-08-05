@@ -4,6 +4,8 @@
 #include <QFileDialog>
 #include <QDebug>
 #include <QMessageBox>
+#include <QClipboard>
+#include <QTimer>
 
 #include "FilesContents.h"
 
@@ -189,4 +191,23 @@ void Widget::resourceWriter(const QString &path, const QString &className)
 
 //     destinationDirectory.mkdir("Factory");
 // }
-// //========================================================================================================================
+
+//========================================================================================================================
+
+void Widget::on_btn_copy_clicked()
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(ui->lineEdit_result->text());
+
+    ui->btn_copy->setStyleSheet("background-color:green;color:white;");
+
+    QTimer::singleShot(500, this, &Widget::onTimeout);
+}
+//========================================================================================================================
+
+void Widget::onTimeout()
+{
+    ui->btn_copy->setStyleSheet("");
+}
+
+//========================================================================================================================

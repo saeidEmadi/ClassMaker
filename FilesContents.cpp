@@ -410,6 +410,7 @@ QString FilesContents::classUi(const QString &className, const QString &baseClas
 
     return content;
 }
+//========================================================================================================================
 
 QString FilesContents::resource()
 {
