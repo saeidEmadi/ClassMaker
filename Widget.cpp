@@ -100,11 +100,13 @@ void Widget::on_btn_create_clicked()
         if (ui->comboBox_baseClass->currentText() != "ModelView")
         {
             bool hasForm = ui->comboBox_baseClass->currentIndex() > 0;
-            createFile(path + "/" + baseClassName, baseClassName, "pri", FilesContents::classPri(baseClassName, hasForm).append("\n\ninclude($$PWD/Resources/Resources.pri)\n"));
+            createFile(path + "/" + baseClassName, baseClassName,
+                "pri", FilesContents::classPri(baseClassName, hasForm).append("\n\ninclude($$PWD/Resources/Resources.pri)\n"));
         }
         else
         {
-            createFile(path + "/" + baseClassName, baseClassName, "pri", FilesContents::mainProviderPri(baseClassName).append("\n\ninclude($$PWD/Resources/Resources.pri)\n"));
+            createFile(path + "/" + baseClassName, baseClassName,
+                "pri", FilesContents::mainProviderPri(baseClassName).append("\n\ninclude($$PWD/Resources/Resources.pri)\n"));
         }
     }
 
