@@ -135,87 +135,6 @@ QString FilesContents::classCpp(const QString &className, bool hasForm)
 }
 //========================================================================================================================
 
-// QString FilesContents::providerClassPri(const QString &className)
-// {
-//     QString content =
-//         QString(
-//         "INCLUDEPATH += $$PWD\n"
-//         "\n"
-//         "include($$PWD/%1Model/%1Model.pri)\n"
-//         "include($$PWD/%1View/%1View.pri)\n"
-//         "\n"
-//         "include($$PWD/Interface/Interface.pri)\n"
-//         "include($$PWD/Factory/Factory.pri)\n"
-//         "\n"
-//         "HEADERS += \\\n"
-//         "    $$PWD/%1Provider.h\n"
-//         "\n"
-//         "SOURCES += \\\n"
-//         "    $$PWD/%1Provider.cpp\n"
-//         )
-//         .arg(className);
-
-//     return content;
-// }
-// //========================================================================================================================
-
-// QString FilesContents::providerClassHeader(const QString &className)
-// {
-//     QString content =
-//         QString(
-//         "#ifndef %1_H\n"
-//         "#define %1_H\n"
-//         "\n"
-//         "#include \"I%2.h\"\n"
-//         "\n"
-//         "class %2 final : public I%2\n"
-//         "{\n"
-//         "public:\n"
-//         "    %2();\n"
-//         "    ~%2() override;\n"
-//         "\n"
-//         "private:\n"
-//         "\n"
-//         "};\n"
-//         "\n"
-//         "#endif"
-//         )
-//         .arg(className.toUpper())
-//         .arg(className)
-//     ;
-
-//     return content;
-// }
-// //========================================================================================================================
-
-// QString FilesContents::providerClassCpp(const QString &className)
-// {
-//     QString content =
-//         QString(
-//         "#include \"%1.h\"\n"
-//         "\n"
-//         "//========================================================================================================================\n"
-//         "\n"
-//         "%1::%1()"
-//         "{\n"
-//         "}\n"
-//         "\n"
-//         "//========================================================================================================================\n"
-//         "\n"
-//         "%1::~%1()\n"
-//         "{\n"
-//         "}\n"
-//         "\n"
-//         "//========================================================================================================================"
-//         )
-//         .arg(className)
-//     ;
-
-//     return content;
-// }
-
-//========================================================================================================================
-
 QString FilesContents::interfacePri(const QString &className)
 {
     QString content =
@@ -236,8 +155,8 @@ QString FilesContents::interfaceHeader(const QString &className, const QString &
 {
     QString content =
         QString(
-        "#ifndef I%1PROVIDER_H\n"
-        "#define I%1PROVIDER_H\n"
+        "#ifndef I%1_H\n"
+        "#define I%1_H\n"
         "\n"
         "#include <%3>\n"
         "\n"
@@ -257,54 +176,6 @@ QString FilesContents::interfaceHeader(const QString &className, const QString &
 
     return content;
 }
-//========================================================================================================================
-
-// QString FilesContents::providerInterfacePri(const QString &className)
-// {
-//     QString content =
-//         QString(
-//         "INCLUDEPATH += $$PWD\n"
-//         "\n"
-//         "HEADERS += \\\n"
-//         "    $$PWD/I%1Provider.h"
-//         )
-//         .arg(className);
-
-//     return content;
-// }
-// //========================================================================================================================
-
-// QString FilesContents::providerInterfaceHeader(const QString &className)
-// {
-//     QString content =
-//         QString(
-//         "#ifndef I%1PROVIDER_H\n"
-//         "#define I%1PROVIDER_H\n"
-//         "\n"
-//         "#include <QObject>\n"
-//         "\n"
-//         "#include \"I%2Model.h\"\n"
-//         "#include \"I%2View.h\"\n"
-//         "\n"
-//         "class I%2 : public QObject\n"
-//         "{\n"
-//         "    Q_OBJECT\n"
-//         "public:\n"
-//         "    virtual ~I%2Provider() = default;\n"
-//         "\n"
-//         "    virtual I%2Model* %2Model() const = 0;\n"
-//         "    virtual I%2View* %2View() const = 0;\n"
-//         "\n"
-//         "};\n"
-//         "\n"
-//         "#endif"
-//         )
-//         .arg(className.toUpper())
-//         .arg(className);
-
-//     return content;
-// }
-
 //========================================================================================================================
 
 QString FilesContents::factoryPri(const QString &className)
@@ -371,6 +242,214 @@ QString FilesContents::factoryCpp(const QString &className)
         )
         .arg(className);
 
+    return content;
+}
+//========================================================================================================================
+
+QString FilesContents::mainProviderPri(const QString &className)
+{
+    QString content = QString(
+        "include($$PWD/%1Provider/Provider.pri)\n"
+        "include($$PWD/%1View/%1View.pri)\n"
+        "include($$PWD/%1Model/%1Model.pri)\n"
+        ).arg(className);
+
+    return content;
+}
+//========================================================================================================================
+
+QString FilesContents::providerPri(const QString &className)
+{
+    QString content = QString(
+        "INCLUDEPATH += $$PWD\n"
+        "\n"
+        "include($$PWD/Interface/Interface.pri)\n"
+        "include($$PWD/Factory/Factory.pri)\n"
+        "HEADERS += \\\n"
+        "    $$PWD/%1Provider.h\n"
+        "\n"
+        "SOURCES += \\\n"
+        "    $$PWD/%1Provider.cpp\n"
+        ).arg(className);
+
+    return content;
+}
+//========================================================================================================================
+QString FilesContents::providerHeader(const QString &className)
+{
+    QString content =
+        QString(
+        "#ifndef %1PROVIDER_H\n"
+        "#define %1PROVIDER_H\n"
+        "\n"
+        "#include \"I%2Provider.h\"\n"
+        "\n"
+        "class %2Provider final : public I%2Provider\n"
+        "{\n"
+        "public:\n"
+        "    %2Provider();\n"
+        "    ~%2Provider() override;\n"
+        "\n"
+        "private:\n"
+        "    I%2Model* %2Model() const override;\n"
+        "    I%2View* %2View() const override;\n"
+        "\n"
+        "private:\n"
+        "    I%2Model* m_%2Model;\n"
+        "    I%2View* m_%2View;\n"
+        "\n"
+        "};\n"
+        "\n"
+        "#endif"
+        )
+        .arg(className.toUpper())
+        .arg(className)
+    ;
+
+    return content;
+}
+//========================================================================================================================
+QString FilesContents::providerCpp(const QString &className)
+{
+    QString content = QString(
+        "#include \"%1Provider.h\"\n"
+        "\n"
+        "#include \"%1ModelFactory.h\"\n"
+        "#include \"%1ViewFactory.h\"\n"
+        "\n"
+        "//========================================================================================================================\n"
+        "\n"
+        "%1Provider::%1Provider()\n"
+        "    : m_%1Model(%1ModelFactory::create())\n"
+        "    , m_%1View(%1ViewFactory::create())\n"
+        "{\n"
+        "    /* set Model for View*/\n"
+        "}\n"
+        "\n"
+        "//========================================================================================================================"
+        "\n"
+        "%1Provider::~%1Provider()\n"
+        "{\n"
+        "    delete m_%1Model;\n"
+        "    delete m_%1View;\n"
+        "}\n"
+        "\n"
+        "//========================================================================================================================"
+        "\n"
+        "I%1View* %1Provider::%1View() const \n"
+        "{\n"
+        "    return m_%1View;\n"
+        "}\n"
+        "\n"
+        "//========================================================================================================================"
+        "\n"
+        "I%1Model* %1Provider::%1Model() const \n"
+        "{\n"
+        "    return m_%1Model;\n"
+        "}\n"
+        "\n"
+        "//========================================================================================================================"
+        ).arg(className);
+
+    return content;
+}
+//========================================================================================================================
+
+QString FilesContents::providerInterfacePri(const QString &className)
+{
+    QString content = QString(
+        "INCLUDEPATH += $$PWD\n"
+        "\n"
+        "HEADERS += \\\n"
+        "    $$PWD/I%1Provider.h\n"
+        ).arg(className);
+    return content;
+}
+//========================================================================================================================
+
+QString FilesContents::providerInterfaceHeader(const QString &className)
+{
+    QString content =
+        QString(
+        "#ifndef I%1PROVIDER_H\n"
+        "#define I%1PROVIDER_H\n"
+        "\n"
+        "#include <QObject>\n"
+        "\n"
+        "#include \"I%2Model.h\"\n"
+        "#include \"I%2View.h\"\n"
+        "\n"
+        "class I%2Provider : public QObject\n"
+        "{\n"
+        "public:\n"
+        "    virtual ~I%2Provider() = default;\n"
+        "\n"
+        "    virtual I%2Model* %2Model() const = 0;\n"
+        "    virtual I%2View* %2View() const = 0;\n"
+        "};\n"
+        "\n"
+        "#endif"
+        )
+        .arg(className.toUpper())
+        .arg(className);
+    return content;
+}
+//========================================================================================================================
+
+QString FilesContents::providerFactoryPri(const QString &className)
+{
+    QString content = QString(
+        "INCLUDEPATH += $$PWD\n"
+        "\n"
+        "HEADERS += \\\n"
+        "    $$PWD/%1ProviderFactory.h\n"
+        "\n"
+        "SOURCES += \\\n"
+        "    $$PWD/%1ProviderFactory.cpp\n"
+        ).arg(className);
+    return content;
+}
+//========================================================================================================================
+
+QString FilesContents::providerFactoryHeader(const QString &className)
+{
+    QString content =
+        QString(
+        "#ifndef %1FACTORY_H\n"
+        "#define %1FACTORY_H\n"
+        "\n"
+        "#include \"I%2Provider.h\"\n"
+        "\n"
+        "class %2ProviderFactory\n"
+        "{\n"
+        "public:\n"
+        "    static I%2Provider* create();\n"
+        "\n"
+        "};\n"
+        "\n"
+        "#endif"
+        )
+        .arg(className.toUpper())
+        .arg(className);
+    return content;
+}
+//========================================================================================================================
+
+QString FilesContents::providerFactoryCpp(const QString &className)
+{
+    QString content = QString(
+        "#include \"%1ProviderFactory.h\"\n"
+        "\n"
+        "#include \"%1Provider.h\"\n"
+        "\n"
+        "//========================================================================================================================\n"
+        "I%1Provider *%1ProviderFactory::create()\n"
+        "{\n"
+        "    return new %1Provider;\n"
+        "}\n"
+        "\n"
+        "//========================================================================================================================\n"
+        ).arg(className);
     return content;
 }
 
