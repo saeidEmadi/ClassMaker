@@ -15,6 +15,7 @@ Widget::Widget(QWidget *parent)
 {
     ui->setupUi(this);
 
+    // ui->comboBox_baseClass->addItems({ "QObject", "QWidget", "QMainWindow", "QDialog", "ModelView" });
     ui->comboBox_baseClass->addItems({ "QObject", "QWidget", "QMainWindow", "QDialog" });
 }
 
@@ -49,6 +50,12 @@ void Widget::on_btn_create_clicked()
         return;
     }
 
+    if (ui->lineEdit_className->text().at(0) < QChar('A'))
+    {
+        QMessageBox::warning(this, "Invalid Input Value", "Class name cant Start with number.", QMessageBox::Button::Ok, QMessageBox::Icon::Critical);
+        return;
+    }
+
     QDir dir(ui->lineEdit_path->text());
 
     if (!dir.exists())
@@ -66,42 +73,20 @@ void Widget::on_btn_create_clicked()
         }
     }
 
-    m_className = ui->lineEdit_className->text();
-
-    bool hasForm = ui->comboBox_baseClass->currentIndex() > 0;
-
     QString path = ui->lineEdit_path->text();
+    QString baseClassName = ui->lineEdit_className->text();
 
-    QDir destinationDirectory(path);
-    destinationDirectory.mkdir(m_className);
-    destinationDirectory.cd(m_className);
-    destinationDirectory.mkdir("Interface");
-    destinationDirectory.mkdir("Factory");
-
-    QString classPath = path + "/" + m_className;
-
-    createFile(classPath, m_className, "pri", FilesContents::classPri(m_className, hasForm));
-    createFile(classPath, m_className, "h", FilesContents::classHeader(m_className, hasForm));
-    createFile(classPath, m_className, "cpp", FilesContents::classCpp(m_className, hasForm));
-
-    QString interfacePath = classPath + "/Interface";
-    QString baseClassName = ui->comboBox_baseClass->currentText();
-
-    createFile(interfacePath, "Interface", "pri", FilesContents::interfacePri(m_className));
-    createFile(interfacePath, "I" + m_className, "h", FilesContents::interfaceHeader(m_className, baseClassName));
-
-    QString factoryPath = classPath + "/Factory";
-
-    createFile(factoryPath, "Factory", "pri", FilesContents::factoryPri(m_className));
-    createFile(factoryPath, m_className + "Factory", "h", FilesContents::factoryHeader(m_className));
-    createFile(factoryPath, m_className + "Factory", "cpp", FilesContents::factoryCpp(m_className));
-
-    ui->lineEdit_result->setText(QString("include($$PWD/%1/%1.pri)").arg(m_className));
-
-    if (hasForm)
+    if (ui->comboBox_baseClass->currentText() != "ModelView")
     {
-        createFile(classPath, m_className, "ui", FilesContents::classUi(m_className, baseClassName));
+        bool hasForm = ui->comboBox_baseClass->currentIndex() > 0;
+        baseClassWriter(path, baseClassName, hasForm);
+        ui->lineEdit_result->setText(QString("include($$PWD/%1/%1.pri)").arg(baseClassName));
     }
+
+    // else
+    // {
+    //     provideClassWriter(path, baseClassName);
+    // }
 }
 
 //========================================================================================================================
@@ -121,4 +106,65 @@ void Widget::createFile(const QString &filePath, const QString &fileName, const 
 }
 //========================================================================================================================
 
+void Widget::baseClassWriter(const QString &path, const QString &className, const bool hasForm)
+{
+    QDir destinationDirectory(path);
+
+    destinationDirectory.mkdir(className);
+    destinationDirectory.cd(className);
+
+    QString classPath = path + "/" + className;
+
+    destinationDirectory.mkdir("Interface");
+    destinationDirectory.mkdir("Factory");
+
+    createFile(classPath, className, "pri", FilesContents::classPri(className, hasForm));
+    createFile(classPath, className, "h", FilesContents::classHeader(className, hasForm));
+    createFile(classPath, className, "cpp", FilesContents::classCpp(className, hasForm));
+
+    QString interfacePath = classPath + "/Interface";
+    QString baseClassName = ui->comboBox_baseClass->currentText();
+
+    createFile(interfacePath, "Interface", "pri", FilesContents::interfacePri(className));
+    createFile(interfacePath, "I" + className, "h", FilesContents::interfaceHeader(className, baseClassName));
+
+    QString factoryPath = classPath + "/Factory";
+
+    createFile(factoryPath, "Factory", "pri", FilesContents::factoryPri(className));
+    createFile(factoryPath, className + "Factory", "h", FilesContents::factoryHeader(className));
+    createFile(factoryPath, className + "Factory", "cpp", FilesContents::factoryCpp(className));
+
+    if (hasForm)
+    {
+        createFile(classPath, className, "ui", FilesContents::classUi(className, baseClassName));
+    }
+}
 //========================================================================================================================
+
+// void Widget::provideClassWriter(const QString &path, const QString &className)
+// {
+//     QDir destinationDirectory(path);
+
+//     destinationDirectory.mkdir(className + "Provider");
+//     destinationDirectory.cd(className + "Provider");
+
+//     destinationDirectory.mkdir(QString("%1Model").arg(className));
+//     destinationDirectory.mkdir(QString("%1View").arg(className));
+
+//     QString _path = path + "/" + className + "Provider";
+
+//     baseClassWriter(_path, "QObject", false);
+//     baseClassWriter(_path, className + "View", true);
+
+//     createFile(_path, className + "Provider", "pri", FilesContents::providerClassPri(className));
+//     createFile(_path, className + "Provider", "h", FilesContents::providerClassHeader(className));
+//     createFile(_path, className + "Provider", "cpp", FilesContents::providerClassCpp(className));
+
+//     destinationDirectory.mkdir("Interface");
+
+//     createFile(_path + "/Interface", "Interface", "pri", FilesContents::providerInterfacePri(className));
+//     createFile(_path + "/Interface", "I" + className + "Provider", "h", FilesContents::providerInterfaceHeader(className));
+
+//     destinationDirectory.mkdir("Factory");
+// }
+// //========================================================================================================================
