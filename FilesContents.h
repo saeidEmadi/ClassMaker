@@ -25,6 +25,8 @@ public:
     static QString factoryCpp(const QString &className);
 
     static QString classUi(const QString &className, const QString &baseClassName);
+
+    static QString resource();
 };
 
 #endif

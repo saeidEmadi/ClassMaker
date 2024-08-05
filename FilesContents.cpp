@@ -411,4 +411,16 @@ QString FilesContents::classUi(const QString &className, const QString &baseClas
     return content;
 }
 
+QString FilesContents::resource()
+{
+    QString content = QString(
+        "<RCC>"
+        "<qresource prefix=\"/\">"
+        "</qresource>"
+        "</RCC>"
+        );
+
+    return content;
+}
+
 //========================================================================================================================
