@@ -32,7 +32,7 @@ private:
     bool copyPath(const QString &sourceDir, const QString &destinationDir);
     void createFile(const QString &filePath, const QString &fileName, const QString &suffix, const QString &contents);
     void baseClassWriter(const QString &path, const QString &className, const bool hasForm);
-    // void provideClassWriter(const QString &path, const QString &className);
+    void provideClassWriter(const QString &path, const QString &className);
     void resourceWriter(const QString &path, const QString &className);
 
 private:

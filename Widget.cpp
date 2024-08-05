@@ -17,8 +17,8 @@ Widget::Widget(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // ui->comboBox_baseClass->addItems({ "QObject", "QWidget", "QMainWindow", "QDialog", "ModelView" });
-    ui->comboBox_baseClass->addItems({ "QObject", "QWidget", "QMainWindow", "QDialog" });
+    ui->comboBox_baseClass->addItems({ "QObject", "QWidget", "QMainWindow", "QDialog", "ModelView" });
+    // ui->comboBox_baseClass->addItems({ "QObject", "QWidget", "QMainWindow", "QDialog" });
 }
 
 //========================================================================================================================
@@ -66,9 +66,16 @@ void Widget::on_btn_create_clicked()
         return;
     }
 
+    QString targetFile = ui->lineEdit_className->text();
+
+    if (ui->comboBox_baseClass->currentText() == "ModelView")
+    {
+        targetFile = targetFile + "Provider";
+    }
+
     for (const QFileInfo &file : dir.entryInfoList(QDir::Dirs))
     {
-        if (file.fileName() == ui->lineEdit_className->text())
+        if (file.fileName() == targetFile)
         {
             QMessageBox::warning(this, "Invalid Input Value", "This Class exists.", QMessageBox::Button::Ok, QMessageBox::Icon::Critical);
             return;
@@ -93,11 +100,10 @@ void Widget::on_btn_create_clicked()
 
         ui->lineEdit_result->setText(QString("include($$PWD/%1/%1.pri)").arg(baseClassName));
     }
-
-    // else
-    // {
-    //     provideClassWriter(path, baseClassName);
-    // }
+    else
+    {
+        provideClassWriter(path, baseClassName);
+    }
 }
 
 //========================================================================================================================
@@ -165,32 +171,32 @@ void Widget::resourceWriter(const QString &path, const QString &className)
 }
 //========================================================================================================================
 
-// void Widget::provideClassWriter(const QString &path, const QString &className)
-// {
-//     QDir destinationDirectory(path);
+void Widget::provideClassWriter(const QString &path, const QString &className)
+{
+    QDir destinationDirectory(path);
 
-//     destinationDirectory.mkdir(className + "Provider");
-//     destinationDirectory.cd(className + "Provider");
+    destinationDirectory.mkdir(className + "Provider");
+    destinationDirectory.cd(className + "Provider");
 
-//     destinationDirectory.mkdir(QString("%1Model").arg(className));
-//     destinationDirectory.mkdir(QString("%1View").arg(className));
+    destinationDirectory.mkdir(QString("%1Model").arg(className));
+    destinationDirectory.mkdir(QString("%1View").arg(className));
 
-//     QString _path = path + "/" + className + "Provider";
+    QString _path = path + "/" + className + "Provider";
 
-//     baseClassWriter(_path, "QObject", false);
-//     baseClassWriter(_path, className + "View", true);
+    baseClassWriter(_path, className + "Model", false);
+    baseClassWriter(_path, className + "View", true);
 
-//     createFile(_path, className + "Provider", "pri", FilesContents::providerClassPri(className));
-//     createFile(_path, className + "Provider", "h", FilesContents::providerClassHeader(className));
-//     createFile(_path, className + "Provider", "cpp", FilesContents::providerClassCpp(className));
+    createFile(_path, className + "Provider", "pri", FilesContents::providerClassPri(className));
+    createFile(_path, className + "Provider", "h", FilesContents::providerClassHeader(className));
+    createFile(_path, className + "Provider", "cpp", FilesContents::providerClassCpp(className));
 
-//     destinationDirectory.mkdir("Interface");
+    destinationDirectory.mkdir("Interface");
 
-//     createFile(_path + "/Interface", "Interface", "pri", FilesContents::providerInterfacePri(className));
-//     createFile(_path + "/Interface", "I" + className + "Provider", "h", FilesContents::providerInterfaceHeader(className));
+    createFile(_path + "/Interface", "Interface", "pri", FilesContents::providerInterfacePri(className));
+    createFile(_path + "/Interface", "I" + className + "Provider", "h", FilesContents::providerInterfaceHeader(className));
 
-//     destinationDirectory.mkdir("Factory");
-// }
+    destinationDirectory.mkdir("Factory");
+}
 
 //========================================================================================================================
 
