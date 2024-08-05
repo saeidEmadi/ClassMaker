@@ -79,7 +79,16 @@ void Widget::on_btn_create_clicked()
     if (ui->comboBox_baseClass->currentText() != "ModelView")
     {
         bool hasForm = ui->comboBox_baseClass->currentIndex() > 0;
+
         baseClassWriter(path, baseClassName, hasForm);
+
+        if (ui->checkBox_Resource->isChecked())
+        {
+            resourceWriter(path, baseClassName);
+
+            createFile(path + "/" + baseClassName, baseClassName, "pri", FilesContents::classPri(baseClassName, hasForm).append("\n\ninclude($$PWD/Resources/Resources.pri)\n"));
+        }
+
         ui->lineEdit_result->setText(QString("include($$PWD/%1/%1.pri)").arg(baseClassName));
     }
 
@@ -138,6 +147,19 @@ void Widget::baseClassWriter(const QString &path, const QString &className, cons
     {
         createFile(classPath, className, "ui", FilesContents::classUi(className, baseClassName));
     }
+}
+
+//========================================================================================================================
+
+void Widget::resourceWriter(const QString &path, const QString &className)
+{
+    QDir destinationDirectory(path);
+    destinationDirectory.cd(className);
+
+    destinationDirectory.mkdir("Resources");
+
+    createFile(path + "/" + className + "/Resources", "Resources", "pri", QString("RESOURCES += $$PWD/%1Resources.qrc").arg(className));
+    createFile(path + "/" + className + "/Resources", className + "Resources", "qrc", FilesContents::resource());
 }
 //========================================================================================================================
 
