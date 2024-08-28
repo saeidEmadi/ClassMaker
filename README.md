@@ -13,7 +13,7 @@
 ## Usage/Examples
 
 - ***Step 1 :***
-***`Download` [`*.exe`](https://github.com/saeidEmadi/ClassMaker/releases/download/latest_Release/ClassMaker.Installer.exe) `file and run it and install`***
+***`Download` [`*.exe`](https://github.com/saeidEmadi/ClassMaker/releases/download/latest_Release/ClassMaker.Installer.exe) `file ,install and run it`***
 - ***Step 2 :***
   ***Select Base Class***
 - ***Step 3 :***
