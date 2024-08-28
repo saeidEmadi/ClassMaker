@@ -24,7 +24,8 @@
 > If you need resources, tick `Add Resource`
  - ***Step 5 :***
   ***Click the `create` button to create it***
-Booooom
+
+    Booooom
  - ***Finally :***
   ***clock the `Copy` and paste to `*.pro` file in your project***
 ## App Screenshot
