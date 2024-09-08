@@ -209,8 +209,8 @@ void Widget::provideClassWriter(const QString &path, const QString &className)
     createFile(_path + "/" + className + "Provider", className + "Provider", "h", FilesContents::providerHeader(className));
     createFile(_path + "/" + className + "Provider", className + "Provider", "cpp", FilesContents::providerCpp(className));
 
-    baseClassWriter(_path, className + "Model", "QObject", false);
-    baseClassWriter(_path, className + "View", "QMainWindow", true);
+    baseClassWriter(_path, className, "QObject", false);
+    baseClassWriter(_path, className + "View", "QWidget", true);
 }
 
 //========================================================================================================================
