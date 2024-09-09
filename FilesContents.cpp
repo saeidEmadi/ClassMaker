@@ -249,7 +249,7 @@ QString FilesContents::factoryCpp(const QString &className)
 QString FilesContents::mainProviderPri(const QString &className)
 {
     QString content = QString(
-        "include($$PWD/%1Provider/Provider.pri)\n"
+        "include($$PWD/Provider/Provider.pri)\n"
         "include($$PWD/%1View/%1View.pri)\n"
         "include($$PWD/%1/%1.pri)\n"
         ).arg(className);
@@ -277,6 +277,9 @@ QString FilesContents::providerPri(const QString &className)
 //========================================================================================================================
 QString FilesContents::providerHeader(const QString &className)
 {
+    QString camelCaseClassName = className;
+    camelCaseClassName[0] = camelCaseClassName[0].toLower();
+
     QString content =
         QString(
         "#ifndef %1PROVIDER_H\n"
@@ -291,12 +294,12 @@ QString FilesContents::providerHeader(const QString &className)
         "    ~%2Provider() override;\n"
         "\n"
         "private:\n"
-        "    I%2* %2() const override;\n"
-        "    I%2View* %2View() const override;\n"
+        "    I%2* %3() const override;\n"
+        "    I%2View* %3View() const override;\n"
         "\n"
         "private:\n"
-        "    I%2* m_%2;\n"
-        "    I%2View* m_%2View;\n"
+        "    I%2* m_%3;\n"
+        "    I%2View* m_%3View;\n"
         "\n"
         "};\n"
         "\n"
@@ -304,6 +307,7 @@ QString FilesContents::providerHeader(const QString &className)
         )
         .arg(className.toUpper())
         .arg(className)
+        .arg(camelCaseClassName)
     ;
 
     return content;
@@ -311,6 +315,9 @@ QString FilesContents::providerHeader(const QString &className)
 //========================================================================================================================
 QString FilesContents::providerCpp(const QString &className)
 {
+    QString camelCaseClassName = className;
+    camelCaseClassName[0] = camelCaseClassName[0].toLower();
+
     QString content = QString(
         "#include \"%1Provider.h\"\n"
         "\n"
@@ -320,8 +327,8 @@ QString FilesContents::providerCpp(const QString &className)
         "//========================================================================================================================\n"
         "\n"
         "%1Provider::%1Provider()\n"
-        "    : m_%1(%1Factory::create())\n"
-        "    , m_%1View(%1ViewFactory::create())\n"
+        "    : m_%2(%1Factory::create())\n"
+        "    , m_%2View(%1ViewFactory::create())\n"
         "{\n"
         "    /* set Model for View*/\n"
         "}\n"
@@ -330,26 +337,27 @@ QString FilesContents::providerCpp(const QString &className)
         "\n"
         "%1Provider::~%1Provider()\n"
         "{\n"
-        "    delete m_%1;\n"
-        "    delete m_%1View;\n"
+        "    delete m_%2;\n"
+        "    delete m_%2View;\n"
         "}\n"
         "\n"
         "//========================================================================================================================"
         "\n"
-        "I%1View* %1Provider::%1View() const \n"
+        "I%1View* %1Provider::%2View() const \n"
         "{\n"
-        "    return m_%1View;\n"
+        "    return m_%2View;\n"
         "}\n"
         "\n"
         "//========================================================================================================================"
         "\n"
-        "I%1* %1Provider::%1() const \n"
+        "I%1* %1Provider::%2() const \n"
         "{\n"
-        "    return m_%1;\n"
+        "    return m_%2;\n"
         "}\n"
         "\n"
         "//========================================================================================================================"
-        ).arg(className);
+        ).arg(className)
+        .arg(camelCaseClassName);
 
     return content;
 }
@@ -369,6 +377,9 @@ QString FilesContents::providerInterfacePri(const QString &className)
 
 QString FilesContents::providerInterfaceHeader(const QString &className)
 {
+    QString camelCaseClassName = className;
+    camelCaseClassName[0] = camelCaseClassName[0].toLower();
+
     QString content =
         QString(
         "#ifndef I%1PROVIDER_H\n"
@@ -384,14 +395,16 @@ QString FilesContents::providerInterfaceHeader(const QString &className)
         "public:\n"
         "    virtual ~I%2Provider() = default;\n"
         "\n"
-        "    virtual I%2* %2() const = 0;\n"
-        "    virtual I%2View* %2View() const = 0;\n"
+        "    virtual I%2* %3() const = 0;\n"
+        "    virtual I%2View* %3View() const = 0;\n"
         "};\n"
         "\n"
         "#endif"
         )
         .arg(className.toUpper())
-        .arg(className);
+        .arg(className)
+        .arg(camelCaseClassName);
+
     return content;
 }
 //========================================================================================================================

@@ -183,31 +183,31 @@ void Widget::provideClassWriter(const QString &path, const QString &className)
     destinationDirectory.mkdir(className);
     destinationDirectory.cd(className);
 
-    destinationDirectory.mkdir(QString("%1Provider").arg(className));
+    destinationDirectory.mkdir(QString("Provider"));
 
     QString _path = path + "/" + className;
 
     createFile(_path, className, "pri", FilesContents::mainProviderPri(className));
 
-    createFile(_path + "/" + className + "Provider", "Provider", "pri", FilesContents::providerPri(className));
+    createFile(_path + "/Provider", "Provider", "pri", FilesContents::providerPri(className));
 
-    destinationDirectory.cd(className + "Provider");
+    destinationDirectory.cd("Provider");
 
     destinationDirectory.mkdir("Interface");
     destinationDirectory.mkdir("Factory");
 
-    QString providerInterfacePath = _path + "/" + className + "Provider/Interface";
+    QString providerInterfacePath = _path + "/Provider/Interface";
 
     createFile(providerInterfacePath, "Interface", "pri", FilesContents::providerInterfacePri(className));
     createFile(providerInterfacePath, "I" + className + "Provider", "h", FilesContents::providerInterfaceHeader(className));
 
-    QString providerFactoryPath = _path + "/" + className + "Provider/Factory";
+    QString providerFactoryPath = _path + "/Provider/Factory";
     createFile(providerFactoryPath, "Factory", "pri", FilesContents::providerFactoryPri(className));
     createFile(providerFactoryPath, className + "ProviderFactory", "h", FilesContents::providerFactoryHeader(className));
     createFile(providerFactoryPath, className + "ProviderFactory", "cpp", FilesContents::providerFactoryCpp(className));
 
-    createFile(_path + "/" + className + "Provider", className + "Provider", "h", FilesContents::providerHeader(className));
-    createFile(_path + "/" + className + "Provider", className + "Provider", "cpp", FilesContents::providerCpp(className));
+    createFile(_path + "/Provider", className + "Provider", "h", FilesContents::providerHeader(className));
+    createFile(_path + "/Provider", className + "Provider", "cpp", FilesContents::providerCpp(className));
 
     baseClassWriter(_path, className, "QObject", false);
     baseClassWriter(_path, className + "View", "QWidget", true);
