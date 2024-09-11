@@ -35,8 +35,30 @@ QString FilesContents::classPri(const QString &className, bool hasForm)
 
 //========================================================================================================================
 
-QString FilesContents::classHeader(const QString &className, bool hasForm)
+QString FilesContents::classHeader(const QString &className, bool hasForm, bool hasModel)
 {
+    QString camelCaseClassName = className;
+    camelCaseClassName.replace(QString("View"), QString(""));
+
+    QString headerInclude =
+        QString(
+        "#include \"I%1.h\"\n"
+        ).arg(camelCaseClassName);
+
+    QString memberValue =
+        QString(
+        "   I%1 *m_"
+        ).arg(camelCaseClassName);
+
+    QString setModelOverride =
+        QString(
+        "   void setModel(I%1 *model) override;\n"
+        ).arg(camelCaseClassName);
+
+    camelCaseClassName[0] = camelCaseClassName[0].toLower();
+
+    memberValue.append(camelCaseClassName + ";");
+
     QString uiNamespace =
         QString(
         "namespace Ui\n"
@@ -60,23 +82,30 @@ QString FilesContents::classHeader(const QString &className, bool hasForm)
         "#include \"I%2.h\"\n"
         "\n"
         "%3"
+        "%4"
         "class %2 final : public I%2\n"
         "{\n"
         "public:\n"
         "    %2();\n"
         "    ~%2() override;\n"
         "\n"
+        "public:\n"
+        "%7\n"
         "private:\n"
+        "%5\n"
         "\n"
-        "%4"
+        "%6"
         "};\n"
         "\n"
         "#endif"
         )
         .arg(className.toUpper())
         .arg(className)
+        .arg(hasModel ? headerInclude : "")
         .arg(hasForm ? uiNamespace : "")
-        .arg(hasForm ? uiVariableDefine : "")
+        .arg(hasModel ? memberValue : "")
+        .arg(hasForm ? uiVariableDefine : "").
+        arg(hasModel ? setModelOverride : "")
     ;
 
     return content;
@@ -84,18 +113,56 @@ QString FilesContents::classHeader(const QString &className, bool hasForm)
 
 //========================================================================================================================
 
-QString FilesContents::classCpp(const QString &className, bool hasForm)
+QString FilesContents::classCpp(const QString &className, bool hasForm, bool hasModel)
 {
     QString uiHeader =
         QString(
         "#include \"ui_%1.h\"\n"
         ).arg(className);
 
+    QString camelCaseClassName = className;
+    camelCaseClassName.replace(QString("View"), QString(""));
+
+    if (hasModel)
+    {
+        uiHeader.append("\n");
+        uiHeader.append("#include \"");
+        uiHeader.append(camelCaseClassName);
+        uiHeader.append("Factory.h\"\n");
+    }
+
     QString uiInitialize =
         QString(
         ":\n"
         "   ui(new Ui::%1)\n"
         ).arg(className);
+
+    QString membrValue = className;
+    membrValue.replace(QString("View"), QString(""));
+    membrValue[0] = membrValue[0].toLower();
+
+    QString setModelFunction =
+        QString(
+        "\n"
+        "\n"
+        "void %1::setModel(I%2 *model)\n"
+        "{\n"
+        "   m_%3 = model;\n"
+        "}\n"
+        "\n"
+        "//========================================================================================================================\n"
+        "\n"
+        )
+        .arg(className)
+        .arg(camelCaseClassName)
+        .arg(membrValue);
+
+    camelCaseClassName[0] = camelCaseClassName[0].toLower();
+
+    if (hasModel)
+    {
+        uiInitialize.append("  , m_" + camelCaseClassName + "(nullptr)\n");
+    }
 
     QString uiSetup =
         "   ui->setupUi(this);\n";
@@ -123,12 +190,14 @@ QString FilesContents::classCpp(const QString &className, bool hasForm)
         "}\n"
         "\n"
         "//========================================================================================================================"
+        "%6\n"
         )
         .arg(className)
         .arg(hasForm ? uiHeader : "")
         .arg(hasForm ? uiInitialize : "\n")
         .arg(hasForm ? uiSetup : "")
         .arg(hasForm ? uiDelete : "")
+        .arg(hasModel ? setModelFunction : "")
     ;
 
     return content;
@@ -151,8 +220,19 @@ QString FilesContents::interfacePri(const QString &className)
 
 //========================================================================================================================
 
-QString FilesContents::interfaceHeader(const QString &className, const QString &baseClassName)
+QString FilesContents::interfaceHeader(const QString &className, const QString &baseClassName, bool hasModel)
 {
+    QString camelCaseClassName = className;
+    camelCaseClassName.replace(QString("View"), QString(""));
+
+    QString setModel =
+        QString(
+        "    virtual void setModel(I%1 *model) = 0;\n"
+        ).arg(camelCaseClassName);
+
+    QString defineModelInterface =
+        QString("class I%1;\n").arg(camelCaseClassName);
+
     QString content =
         QString(
         "#ifndef I%1_H\n"
@@ -160,11 +240,16 @@ QString FilesContents::interfaceHeader(const QString &className, const QString &
         "\n"
         "#include <%3>\n"
         "\n"
+        "%5\n"
+        "\n"
         "class I%2 : public %3\n"
         "{\n"
         "    Q_OBJECT\n"
         "public:\n"
         "    virtual ~I%2() = default;\n"
+        "\n"
+        "public:\n"
+        "%4\n"
         "\n"
         "};\n"
         "\n"
@@ -172,7 +257,9 @@ QString FilesContents::interfaceHeader(const QString &className, const QString &
         )
         .arg(className.toUpper())
         .arg(className)
-        .arg(baseClassName);
+        .arg(baseClassName)
+        .arg(hasModel ? setModel : "")
+        .arg(hasModel ? defineModelInterface : "");
 
     return content;
 }
@@ -330,7 +417,7 @@ QString FilesContents::providerCpp(const QString &className)
         "    : m_%2(%1Factory::create())\n"
         "    , m_%2View(%1ViewFactory::create())\n"
         "{\n"
-        "    /* set Model for View*/\n"
+        "    m_%2View->setModel(m_%2);\n"
         "}\n"
         "\n"
         "//========================================================================================================================"

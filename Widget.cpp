@@ -81,7 +81,7 @@ void Widget::on_btn_create_clicked()
     {
         bool hasForm = ui->comboBox_baseClass->currentIndex() > 0;
 
-        baseClassWriter(path, baseClassName, ui->comboBox_baseClass->currentText(), hasForm);
+        baseClassWriter(path, baseClassName, ui->comboBox_baseClass->currentText(), hasForm, false);
     }
     else
     {
@@ -130,7 +130,7 @@ void Widget::createFile(const QString &filePath, const QString &fileName, const 
 }
 //========================================================================================================================
 
-void Widget::baseClassWriter(const QString &path, const QString &className, const QString &baseClassName, const bool hasForm)
+void Widget::baseClassWriter(const QString &path, const QString &className, const QString &baseClassName, const bool hasForm, bool hasModel)
 {
     QDir destinationDirectory(path);
 
@@ -143,13 +143,13 @@ void Widget::baseClassWriter(const QString &path, const QString &className, cons
     destinationDirectory.mkdir("Factory");
 
     createFile(classPath, className, "pri", FilesContents::classPri(className, hasForm));
-    createFile(classPath, className, "h", FilesContents::classHeader(className, hasForm));
-    createFile(classPath, className, "cpp", FilesContents::classCpp(className, hasForm));
+    createFile(classPath, className, "h", FilesContents::classHeader(className, hasForm, hasModel));
+    createFile(classPath, className, "cpp", FilesContents::classCpp(className, hasForm, hasModel));
 
     QString interfacePath = classPath + "/Interface";
 
     createFile(interfacePath, "Interface", "pri", FilesContents::interfacePri(className));
-    createFile(interfacePath, "I" + className, "h", FilesContents::interfaceHeader(className, baseClassName));
+    createFile(interfacePath, "I" + className, "h", FilesContents::interfaceHeader(className, baseClassName, hasModel));
 
     QString factoryPath = classPath + "/Factory";
 
@@ -209,8 +209,8 @@ void Widget::provideClassWriter(const QString &path, const QString &className)
     createFile(_path + "/Provider", className + "Provider", "h", FilesContents::providerHeader(className));
     createFile(_path + "/Provider", className + "Provider", "cpp", FilesContents::providerCpp(className));
 
-    baseClassWriter(_path, className, "QObject", false);
-    baseClassWriter(_path, className + "View", "QWidget", true);
+    baseClassWriter(_path, className, "QObject", false, false);
+    baseClassWriter(_path, className + "View", "QWidget", true, true);
 }
 
 //========================================================================================================================
